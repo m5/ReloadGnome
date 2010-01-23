@@ -1,0 +1,90 @@
+<html>
+<head>
+<style>
+body {
+  min-width:357px;
+  overflow-x:hidden;
+}
+span#status{
+  color:red;
+  }
+
+.hidden{
+  -webkit-transition: all 1s ease-in-out;
+  opacity: 0;
+  }
+
+.active{
+  -webkit-transition: all .5s ease-in-out;
+  opacity: 1;
+  }
+
+img {
+  margin:5px;
+  border:2px solid black;
+  vertical-align:middle;
+  width:75px;
+  height:75px;
+}
+</style>
+<script>
+function flash_status(text){
+  var status = document.getElementById("status");
+  status.innerHTML = text;
+  status.className = 'active';
+  setTimeout(function() {
+    status.className = 'hidden';
+  }, 750);
+}
+  
+function save_options() {
+  var page_text = document.getElementById("refresh_to_page");
+  var refresh_to_page = page_text.value;
+
+  var timeout_text = document.getElementById("timeout");
+  var timeout = timeout_text.value;
+
+  if(isNaN(timeout)){
+    flash_status("\"" + timeout + "\" is not a valid number of seconds.");
+  }
+
+  localStorage["refresh_to_page"] = refresh_to_page;
+  localStorage["timeout"] = timeout;
+
+  flash_status("Options saved.");
+}
+
+function restore_options() {
+  var refresh_to_page = localStorage["refresh_to_page"];
+  if (!refresh_to_page) {
+    return;
+  }
+  var page_text = document.getElementById("refresh_to_page");
+  page_text.value = refresh_to_page;
+
+  var timeout = localStorage["timeout"];
+  if (!timeout) {
+    return;
+  }
+  var timeout_text = document.getElementById("timeout");
+  timeout_text.value = timeout;
+  
+}
+
+</script>
+</head>
+<body onload="restore_options()">
+<ul>
+  <li>
+    <label for="refresh_to_page">Refresh to</label>
+    <input id="refresh_to_page"></input>
+  </li><li>
+    <label for="timeout">After</label>
+    <input id="timeout"></input>seconds.
+  </li><li>
+    <button onClick="save_options()">Save</button>
+  </li>
+</ul>
+<span id="status" class="hidden"></span>
+</body>
+</html>
