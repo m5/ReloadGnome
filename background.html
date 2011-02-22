@@ -1,20 +1,48 @@
 <script>
+var gnome = (function(){
+  var refreshAt = {};
+  var delay = (localStorage.timeout||60)*1000;
+  var refreshToPage = localStorage.refresh_to_page||"http://www.google.com";
+
+  var i = {};
+  i.config = function(request,sender){
+      var conf = {};
+      var i;
+      var keys = request.keys.split(",");
+      for (i in keys){
+        var key = keys[i];
+        conf[key] = localStorage[key];
+      }
+     return conf;
+  };
+  i.update = function(request,sender){
+    var now = new Date().getTime();
+
+    if(request.motionDetected){
+      refreshAt[sender.tab.id] = now + delay; 
+    }
+
+    var tRefresh = refreshAt[sender.tab.id] || now + delay;
+
+    if(tRefresh < now){
+      return {"load":refreshToPage};
+    }else{
+      return {"wait":tRefresh - now};
+    }
+  };
+  return i;
+}());
+
 chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
     console.log(sender.tab ?
                 "from a content script:" + sender.tab.url :
                 "from the extension");
-    if (request.type == "config"){
-      conf = {};
-      var i;
-      var keys = request.keys.split(",");
-      for (i in keys){
-        var key = keys[i]
-        conf[key] = localStorage[key];
-      }
-      sendResponse(conf);
-    }else{
-      sendResponse({});
+    var response = {};
+    try {
+      response = gnome[request.type](request,sender);
+    }catch(err){
     }
-  });
+    sendResponse(response);
+});
 </script>

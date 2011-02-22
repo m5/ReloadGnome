@@ -1,13 +1,14 @@
 {
   "name": "Reload Gnome",
-  "version": "1.21",
+  "version": "1.31",
   "description":"A kiosk mode idle-refresh utility. Reloads a home page after N seconds of inactivity.",
   "icons": { "48": "gnome-48.png",
              "36": "gnome-36.png",
             "128": "gnome-128.png" },
   "content_scripts" : [{
-    "matches": ["http://*/*"],
-    "js": ["gnome.js"]
+    "matches": ["http://*/*","https://*/*","file://*/*"],
+    "js": ["gnome.js"],
+    "all_frames":true
   }],
   "background_page": "background.html",
   "options_page": "options.html"
